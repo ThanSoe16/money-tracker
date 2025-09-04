@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="#10B981"/>
+  
+  <!-- Thai Baht Symbol -->
+  <g transform="translate(256,256)">
+    <!-- Vertical Lines -->
+    <rect x="-8" y="-180" width="16" height="360" fill="white" rx="8"/>
+    <rect x="-8" y="-200" width="16" height="40" fill="white" rx="8"/>
+    <rect x="-8" y="160" width="16" height="40" fill="white" rx="8"/>
+    
+    <!-- Main B Shape -->
+    <path d="M -60 -120 L -60 120 L 40 120 C 80 120 100 80 100 60 C 100 20 80 0 60 0 C 80 0 90 -20 90 -60 C 90 -80 70 -120 40 -120 L -60 -120 Z M -20 -80 L 30 -80 C 40 -80 50 -70 50 -60 C 50 -50 40 -40 30 -40 L -20 -40 L -20 -80 Z M -20 0 L 35 0 C 45 0 60 10 60 30 C 60 50 45 80 35 80 L -20 80 L -20 0 Z" fill="white"/>
+  </g>
+  
+  <!-- Dollar sign accent -->
+  <circle cx="400" cy="150" r="30" fill="white" opacity="0.3"/>
+  <text x="400" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#10B981">฿</text>
+</svg>
