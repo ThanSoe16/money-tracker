@@ -60,6 +60,32 @@ export interface WeeklyAlert {
   completed: boolean;
 }
 
+// Monthly Record Types
+export interface MonthlyRecord {
+  id: string;
+  month: string; // YYYY-MM format
+  totalIncome: number;
+  totalExpenses: number;
+  totalSavings: number;
+  budgetUtilization: number; // percentage
+  accountBalances: Array<{
+    accountId: string;
+    accountName: string;
+    balance: number;
+  }>;
+  categoryBreakdown: {
+    food: number;
+    transport: number;
+    shopping: number;
+    entertainment: number;
+    bills: number;
+    healthcare: number;
+    others: number;
+  };
+  createdAt: string; // ISO date string
+  notes?: string;
+}
+
 // Bank Configuration
 export interface Bank {
   name: string;
@@ -75,6 +101,7 @@ export interface AppState {
   budgets: Budget[];
   expenses: Expense[];
   weeklyAlerts: WeeklyAlert[];
+  monthlyRecords: MonthlyRecord[];
   currentBudget: Budget | null;
   loading: boolean;
   error: string | null;

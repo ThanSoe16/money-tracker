@@ -1,4 +1,4 @@
-import { BankAccount, Budget, Expense, WeeklyAlert } from '@/types';
+import { BankAccount, Budget, Expense, WeeklyAlert, MonthlyRecord } from '@/types';
 
 const STORAGE_KEYS = {
   ACCOUNTS: 'money-tracker-accounts',
@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   EXPENSES: 'money-tracker-expenses',
   WEEKLY_ALERTS: 'money-tracker-weekly-alerts',
   APP_STATE: 'money-tracker-app-state',
-} as const;
+  MONTHLY_RECORDS: 'money-tracker-monthly-records',
+} as const;;
 
 class LocalStorageService {
   private isClient = typeof window !== 'undefined';
@@ -173,6 +174,75 @@ class LocalStorageService {
     return accounts
       .filter(acc => acc.isActive && acc.accountType !== 'credit')
       .reduce((total, acc) => total + acc.balance, 0);
+  }
+
+  // Monthly Records
+  getMonthlyRecords(): MonthlyRecord[] {
+    return this.getItem<MonthlyRecord[]>(STORAGE_KEYS.MONTHLY_RECORDS, []);
+  }
+
+  setMonthlyRecords(records: MonthlyRecord[]): void {
+    this.setItem(STORAGE_KEYS.MONTHLY_RECORDS, records);
+  }
+
+  addMonthlyRecord(record: MonthlyRecord): void {
+    const records = this.getMonthlyRecords();
+    const existingIndex = records.findIndex(r => r.month === record.month);
+    
+    if (existingIndex >= 0) {
+      records[existingIndex] = record;
+    } else {
+      records.push(record);
+    }
+    
+    this.setMonthlyRecords(records);
+  }
+
+  getMonthlyRecord(month: string): MonthlyRecord | undefined {
+    const records = this.getMonthlyRecords();
+    return records.find(r => r.month === month);
+  }
+
+  generateMonthlyRecord(month: string): MonthlyRecord {
+    const expenses = this.getExpensesForMonth(month);
+    const accounts = this.getAccounts();
+    const budget = this.getBudgets().find(b => b.month === month);
+    
+    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const categoryBreakdown = {
+      food: 0,
+      transport: 0,
+      shopping: 0,
+      entertainment: 0,
+      bills: 0,
+      healthcare: 0,
+      others: 0,
+    };
+    
+    expenses.forEach(expense => {
+      categoryBreakdown[expense.category] += expense.amount;
+    });
+    
+    const accountBalances = accounts.map(account => ({
+      accountId: account.id,
+      accountName: account.accountNickname,
+      balance: account.balance,
+    }));
+    
+    const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
+    const budgetUtilization = budget ? (totalExpenses / budget.totalBudget) * 100 : 0;
+    
+    return {
+      id: `monthly-record-${month}-${Date.now()}`,
+      month,
+      totalIncome: 0, // To be manually updated
+      totalExpenses,
+      totalSavings: totalBalance,
+      budgetUtilization,
+      accountBalances,
+      categoryBreakdown,
+      createdAt: new Date().toISOString(),
+    };
   }
 
   getExpensesForMonth(month: string): Expense[] {

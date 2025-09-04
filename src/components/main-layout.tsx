@@ -6,9 +6,10 @@ import { DashboardPage } from "@/components/dashboard-page"
 import { AccountsPage } from "@/components/accounts-page"
 import { BudgetPage } from "@/components/budget-page"
 import { ExpensesPage } from "@/components/expenses-page"
+import { MonthlyRecordsPage } from "@/components/monthly-records-page"
 import { PWAPrompt } from "@/components/pwa-prompt"
 import { OfflineIndicator } from "@/components/offline-indicator"
-import { Home, Wallet, Target, Receipt } from "lucide-react"
+import { Home, Wallet, Target, Receipt, Calendar } from "lucide-react"
 
 export function MainLayout() {
   const [activeTab, setActiveTab] = React.useState("dashboard")
@@ -33,12 +34,16 @@ export function MainLayout() {
           <TabsContent value="expenses" className="mt-0 h-full">
             <ExpensesPage />
           </TabsContent>
+          
+          <TabsContent value="records" className="mt-0 h-full">
+            <MonthlyRecordsPage />
+          </TabsContent>
         </div>
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 bottom-nav">
           <div className="container mx-auto px-4">
-            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 h-16 bg-transparent gap-1 py-2">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-5 h-16 bg-transparent gap-1 py-2">
               <TabsTrigger 
                 value="dashboard" 
                 className="flex flex-col items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs py-2 px-1 h-auto rounded-lg transition-all duration-200 data-[state=active]:scale-105"
@@ -66,6 +71,13 @@ export function MainLayout() {
               >
                 <Receipt className="h-5 w-5" />
                 <span className="font-medium">Expenses</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="records" 
+                className="flex flex-col items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs py-2 px-1 h-auto rounded-lg transition-all duration-200 data-[state=active]:scale-105"
+              >
+                <Calendar className="h-5 w-5" />
+                <span className="font-medium">Records</span>
               </TabsTrigger>
             </TabsList>
           </div>
