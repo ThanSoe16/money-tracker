@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CurrencyInput } from "@/components/ui/currency-input"
-import { AddExpenseForm, Expense, EXPENSE_CATEGORIES, PAYMENT_METHODS, Budget } from "@/types"
+import { AddExpenseForm, Expense, EXPENSE_CATEGORIES, PAYMENT_METHODS, Budget, CURRENCIES } from "@/types"
 import { storageService } from "@/lib/storage"
+import { getCurrencySymbol } from "@/lib/currency"
 
 interface AddExpenseDialogProps {
   open: boolean
@@ -47,6 +48,7 @@ export function AddExpenseDialog({
 }: AddExpenseDialogProps) {
   const [form, setForm] = React.useState<AddExpenseForm>({
     amount: 0,
+    currency: 'THB',
     category: 'food',
     description: '',
     date: new Date().toISOString().split('T')[0],
@@ -66,6 +68,7 @@ export function AddExpenseDialog({
       setAccounts(allAccounts)
       setForm({
         amount: 0,
+        currency: 'THB',
         category: 'food',
         description: '',
         date: new Date().toISOString().split('T')[0],
@@ -86,6 +89,7 @@ export function AddExpenseDialog({
       const expense: Expense = {
         id: `expense-${Date.now()}`,
         amount: form.amount,
+        currency: form.currency,
         category: form.category,
         description: form.description,
         date: form.date,
@@ -134,14 +138,34 @@ export function AddExpenseDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Amount *</label>
-            <CurrencyInput
-              value={form.amount}
-              onChange={(value) => setForm(prev => ({ ...prev, amount: value }))}
-              placeholder="0.00"
-              required
-            />
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-2 space-y-2">
+              <label className="text-sm font-medium">Amount *</label>
+              <CurrencyInput
+                value={form.amount}
+                onChange={(value) => setForm(prev => ({ ...prev, amount: value }))}
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Currency</label>
+              <Select 
+                value={form.currency} 
+                onValueChange={(value: 'THB' | 'USDT' | 'MMK') => setForm(prev => ({ ...prev, currency: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {getCurrencySymbol(currency)} {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

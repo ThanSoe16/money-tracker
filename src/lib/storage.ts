@@ -1,13 +1,16 @@
-import { BankAccount, Budget, Expense, WeeklyAlert, MonthlyRecord } from '@/types';
+import { BankAccount, Budget, Expense, Income, CurrencyExchange, ExchangeSettings, WeeklyAlert, MonthlyRecord } from '@/types';
 
 const STORAGE_KEYS = {
   ACCOUNTS: 'money-tracker-accounts',
   BUDGETS: 'money-tracker-budgets',
   EXPENSES: 'money-tracker-expenses',
+  INCOME: 'money-tracker-income',
+  CURRENCY_EXCHANGES: 'money-tracker-currency-exchanges',
+  EXCHANGE_SETTINGS: 'money-tracker-exchange-settings',
   WEEKLY_ALERTS: 'money-tracker-weekly-alerts',
   APP_STATE: 'money-tracker-app-state',
   MONTHLY_RECORDS: 'money-tracker-monthly-records',
-} as const;;
+} as const;;;
 
 class LocalStorageService {
   private isClient = typeof window !== 'undefined';
@@ -122,6 +125,62 @@ class LocalStorageService {
 
   setExpenses(expenses: Expense[]): void {
     this.setItem(STORAGE_KEYS.EXPENSES, expenses);
+  }
+
+  // Income methods
+  getIncome(): Income[] {
+    return this.getItem<Income[]>(STORAGE_KEYS.INCOME, []);
+  }
+
+  setIncome(income: Income[]): void {
+    this.setItem(STORAGE_KEYS.INCOME, income);
+  }
+
+  addIncome(income: Income): void {
+    const incomeList = this.getIncome();
+    incomeList.push(income);
+    this.setIncome(incomeList);
+  }
+
+  deleteIncome(id: string): void {
+    const incomeList = this.getIncome();
+    const filteredIncome = incomeList.filter(income => income.id !== id);
+    this.setIncome(filteredIncome);
+  }
+
+  // Currency exchange methods
+  getCurrencyExchanges(): CurrencyExchange[] {
+    return this.getItem<CurrencyExchange[]>(STORAGE_KEYS.CURRENCY_EXCHANGES, []);
+  }
+
+  setCurrencyExchanges(exchanges: CurrencyExchange[]): void {
+    this.setItem(STORAGE_KEYS.CURRENCY_EXCHANGES, exchanges);
+  }
+
+  addCurrencyExchange(exchange: CurrencyExchange): void {
+    const exchanges = this.getCurrencyExchanges();
+    exchanges.push(exchange);
+    this.setCurrencyExchanges(exchanges);
+  }
+
+  // Exchange settings methods
+  getExchangeSettings(): ExchangeSettings {
+    return this.getItem<ExchangeSettings>(STORAGE_KEYS.EXCHANGE_SETTINGS, {
+      rates: {
+        'THB_USDT': 30.5,
+        'USDT_THB': 1/30.5,
+        'THB_MMK': 0.85,
+        'MMK_THB': 1/0.85,
+        'USDT_MMK': 26,
+        'MMK_USDT': 1/26
+      },
+      lastUpdated: new Date().toISOString(),
+      autoUpdate: false
+    });
+  }
+
+  setExchangeSettings(settings: ExchangeSettings): void {
+    this.setItem(STORAGE_KEYS.EXCHANGE_SETTINGS, settings);
   }
 
   addExpense(expense: Expense): void {

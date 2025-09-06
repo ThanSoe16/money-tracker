@@ -3,16 +3,22 @@
 import * as React from "react"
 import { BankAccount } from "@/types"
 import { storageService } from "@/lib/storage"
-import { formatTHB } from "@/lib/currency"
+import { formatCurrency, convertCurrency } from "@/lib/currency"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BankAccountCard } from "@/components/bank-account-card"
 import { AddAccountDialog } from "@/components/add-account-dialog"
-import { Plus, Wallet, TrendingUp, TrendingDown } from "lucide-react"
+import { AddIncomeDialog } from "@/components/add-income-dialog"
+import { CurrencyExchangeDialog } from "@/components/currency-exchange-dialog"
+import { ExchangeSettingsDialog } from "@/components/exchange-settings-dialog"
+import { Plus, Wallet, TrendingUp, TrendingDown, ArrowUpCircle, RefreshCw, Settings } from "lucide-react"
 
 export function AccountsPage() {
   const [accounts, setAccounts] = React.useState<BankAccount[]>([])
   const [showAddDialog, setShowAddDialog] = React.useState(false)
+  const [showIncomeDialog, setShowIncomeDialog] = React.useState(false)
+  const [showExchangeDialog, setShowExchangeDialog] = React.useState(false)
+  const [showSettingsDialog, setShowSettingsDialog] = React.useState(false)
   const [editingAccount, setEditingAccount] = React.useState<BankAccount | undefined>()
 
   const loadAccounts = React.useCallback(() => {
@@ -23,16 +29,36 @@ export function AccountsPage() {
     loadAccounts()
   }, [loadAccounts])
 
+  // Calculate total balance in THB equivalent
   const totalBalance = React.useMemo(() => {
+    const exchangeSettings = storageService.getExchangeSettings()
     return accounts
       .filter(acc => acc.isActive && acc.accountType !== 'credit')
-      .reduce((sum, acc) => sum + acc.balance, 0)
+      .reduce((sum, acc) => {
+        if (acc.currency === 'THB') {
+          return sum + acc.balance
+        } else {
+          const rateKey = `${acc.currency}_THB`
+          const rate = exchangeSettings.rates[rateKey] || 1
+          return sum + convertCurrency(acc.balance, acc.currency, 'THB', rate)
+        }
+      }, 0)
   }, [accounts])
 
   const totalDebt = React.useMemo(() => {
+    const exchangeSettings = storageService.getExchangeSettings()
     return Math.abs(accounts
       .filter(acc => acc.isActive && acc.accountType === 'credit' && acc.balance < 0)
-      .reduce((sum, acc) => sum + acc.balance, 0))
+      .reduce((sum, acc) => {
+        const balance = Math.abs(acc.balance)
+        if (acc.currency === 'THB') {
+          return sum + balance
+        } else {
+          const rateKey = `${acc.currency}_THB`
+          const rate = exchangeSettings.rates[rateKey] || 1
+          return sum + convertCurrency(balance, acc.currency, 'THB', rate)
+        }
+      }, 0))
   }, [accounts])
 
   const netWorth = totalBalance - totalDebt
@@ -69,10 +95,24 @@ export function AccountsPage() {
             Manage your bank accounts and track your balances
           </p>
         </div>
-        <Button onClick={() => setShowAddDialog(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Account
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowSettingsDialog(true)}>
+            <Settings className="w-4 h-4 mr-2" />
+            Exchange Settings
+          </Button>
+          <Button variant="outline" onClick={() => setShowExchangeDialog(true)}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Exchange Currency
+          </Button>
+          <Button variant="outline" onClick={() => setShowIncomeDialog(true)}>
+            <ArrowUpCircle className="w-4 h-4 mr-2" />
+            Add Income
+          </Button>
+          <Button onClick={() => setShowAddDialog(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Account
+          </Button>
+        </div>
       </div>
 
       {/* Overview Cards */}
@@ -84,7 +124,7 @@ export function AccountsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatTHB(totalBalance)}
+              {formatCurrency(totalBalance, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
               Across {accounts.filter(acc => acc.accountType !== 'credit').length} accounts
@@ -99,7 +139,7 @@ export function AccountsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {formatTHB(totalDebt)}
+              {formatCurrency(totalDebt, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
               Across {creditAccounts.length} credit accounts
@@ -114,7 +154,7 @@ export function AccountsPage() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatTHB(netWorth)}
+              {formatCurrency(netWorth, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
               Total assets minus debts
@@ -202,6 +242,33 @@ export function AccountsPage() {
         }}
         onAccountAdded={handleAccountAdded}
         editAccount={editingAccount}
+      />
+
+      {/* Add Income Dialog */}
+      <AddIncomeDialog
+        open={showIncomeDialog}
+        onOpenChange={setShowIncomeDialog}
+        onIncomeAdded={() => {
+          loadAccounts() // Refresh accounts to show updated balances
+        }}
+      />
+
+      {/* Currency Exchange Dialog */}
+      <CurrencyExchangeDialog
+        open={showExchangeDialog}
+        onOpenChange={setShowExchangeDialog}
+        onExchangeAdded={() => {
+          loadAccounts() // Refresh accounts to show updated balances
+        }}
+      />
+
+      {/* Exchange Settings Dialog */}
+      <ExchangeSettingsDialog
+        open={showSettingsDialog}
+        onOpenChange={setShowSettingsDialog}
+        onSettingsUpdated={() => {
+          // Optionally refresh UI to show updated exchange rates
+        }}
       />
     </div>
   )

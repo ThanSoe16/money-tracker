@@ -2,7 +2,7 @@ import * as React from "react"
 import { BankAccount } from "@/types"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { formatTHB } from "@/lib/currency"
+import { formatCurrency } from "@/lib/currency"
 import { Edit, Trash2, Star } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -86,7 +86,7 @@ export function BankAccountCard({
                 !isCredit && isNegative ? "text-red-600" : ""
               )}
             >
-              {formatTHB(account.balance)}
+              {formatCurrency(account.balance, account.currency)}
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span 

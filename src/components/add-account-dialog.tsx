@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CurrencyInput } from "@/components/ui/currency-input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AddAccountForm, BankAccount, BANKS, ACCOUNT_TYPES } from "@/types"
+import { AddAccountForm, BankAccount, BANKS, ACCOUNT_TYPES, CURRENCIES } from "@/types"
 import { storageService } from "@/lib/storage"
 
 interface AddAccountDialogProps {
@@ -26,6 +26,7 @@ export function AddAccountDialog({
     accountNickname: '',
     accountType: 'savings',
     balance: 0,
+    currency: 'THB',
     country: 'TH',
     isDefault: false,
   })
@@ -39,6 +40,7 @@ export function AddAccountDialog({
         accountNickname: editAccount.accountNickname,
         accountType: editAccount.accountType,
         balance: editAccount.balance,
+        currency: editAccount.currency,
         country: editAccount.country,
         isDefault: editAccount.isDefault,
       })
@@ -48,6 +50,7 @@ export function AddAccountDialog({
         accountNickname: '',
         accountType: 'savings',
         balance: 0,
+        currency: 'THB',
         country: 'TH',
         isDefault: false,
       })
@@ -69,6 +72,7 @@ export function AddAccountDialog({
         accountNickname: form.accountNickname,
         accountType: form.accountType,
         balance: form.balance,
+        currency: form.currency,
         color: selectedBank?.color || '#6B7280',
         logo: selectedBank?.logo || 'default',
         lastUpdated: new Date().toISOString(),
@@ -181,6 +185,28 @@ export function AddAccountDialog({
                       {type === 'crypto' ? 'Crypto Exchange' : 
                        type === 'investment' ? 'Investment Account' : 
                        type}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Currency</label>
+            <Select 
+              value={form.currency} 
+              onValueChange={(value: BankAccount['currency']) => setForm(prev => ({ ...prev, currency: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((currency) => (
+                  <SelectItem key={currency} value={currency}>
+                    <span>{currency === 'THB' ? '฿ Thai Baht (THB)' : 
+                           currency === 'USDT' ? '$ Tether USD (USDT)' : 
+                           'K Myanmar Kyat (MMK)'}
                     </span>
                   </SelectItem>
                 ))}

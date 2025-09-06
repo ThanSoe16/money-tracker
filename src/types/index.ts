@@ -4,13 +4,52 @@ export interface BankAccount {
   bankName: string;
   accountNickname: string;
   accountType: 'savings' | 'checking' | 'credit' | 'crypto' | 'investment';
-  balance: number; // in THB
+  balance: number;
+  currency: 'THB' | 'USDT' | 'MMK';
   color: string; // bank brand color
   logo: string;
   lastUpdated: string; // ISO date string
   isActive: boolean;
   isDefault: boolean; // default account for expenses
   country: 'TH' | 'MM' | 'Global'; // Thailand, Myanmar, Global (Binance)
+}
+
+// Income transaction interface
+export interface Income {
+  id: string;
+  amount: number;
+  currency: 'THB' | 'USDT' | 'MMK';
+  category: 'salary' | 'freelance' | 'investment' | 'bonus' | 'other';
+  description: string;
+  date: string; // ISO date string
+  accountId: string;
+  source?: string; // e.g., company name, client name
+  isRecurring: boolean;
+  recurringPeriod?: 'weekly' | 'monthly' | 'yearly';
+}
+
+// Currency exchange transaction
+export interface CurrencyExchange {
+  id: string;
+  fromAmount: number;
+  fromCurrency: 'THB' | 'USDT' | 'MMK';
+  toAmount: number;
+  toCurrency: 'THB' | 'USDT' | 'MMK';
+  exchangeRate: number;
+  fromAccountId: string;
+  toAccountId: string;
+  date: string; // ISO date string
+  description?: string;
+  fees?: number; // exchange fees in from currency
+}
+
+// Currency exchange settings
+export interface ExchangeSettings {
+  rates: {
+    [key: string]: number; // e.g., "THB_USDT": 30.5, "MMK_THB": 0.015
+  };
+  lastUpdated: string; // ISO date string
+  autoUpdate: boolean;
 }
 
 // Budget Types
@@ -39,7 +78,8 @@ export interface Budget {
 // Expense Types
 export interface Expense {
   id: string;
-  amount: number; // THB
+  amount: number;
+  currency: 'THB' | 'USDT' | 'MMK';
   category: keyof Budget['categories'];
   description: string;
   date: string; // ISO date string
@@ -100,6 +140,9 @@ export interface AppState {
   accounts: BankAccount[];
   budgets: Budget[];
   expenses: Expense[];
+  income: Income[];
+  currencyExchanges: CurrencyExchange[];
+  exchangeSettings: ExchangeSettings;
   weeklyAlerts: WeeklyAlert[];
   monthlyRecords: MonthlyRecord[];
   currentBudget: Budget | null;
@@ -113,12 +156,14 @@ export interface AddAccountForm {
   accountNickname: string;
   accountType: BankAccount['accountType'];
   balance: number;
+  currency: BankAccount['currency'];
   country: BankAccount['country'];
   isDefault: boolean;
 }
 
 export interface AddExpenseForm {
   amount: number;
+  currency: 'THB' | 'USDT' | 'MMK';
   category: keyof Budget['categories'];
   description: string;
   date: string;
@@ -184,6 +229,19 @@ export const ACCOUNT_TYPES: Array<BankAccount['accountType']> = [
   'credit',
   'crypto',
   'investment',
+];
+export const CURRENCIES: Array<'THB' | 'USDT' | 'MMK'> = [
+  'THB',
+  'USDT', 
+  'MMK'
+];
+
+export const INCOME_CATEGORIES: Array<Income['category']> = [
+  'salary',
+  'freelance',
+  'investment',
+  'bonus',
+  'other'
 ];
 
 export const PAYMENT_METHODS: Array<Expense['paymentMethod']> = [
