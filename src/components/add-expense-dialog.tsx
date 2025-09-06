@@ -129,7 +129,7 @@ export function AddExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[90%] max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Expense</DialogTitle>
           <DialogDescription>
@@ -137,10 +137,10 @@ export function AddExpenseDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-2 space-y-2">
-              <label className="text-sm font-medium">Amount *</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex gap-3">
+            <div className="flex-1 space-y-2">
+              <label className="text-sm font-medium text-gray-700">Amount *</label>
               <CurrencyInput
                 value={form.amount}
                 onChange={(value) => setForm(prev => ({ ...prev, amount: value }))}
@@ -148,8 +148,8 @@ export function AddExpenseDialog({
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Currency</label>
+            <div className="w-24 space-y-2">
+              <label className="text-sm font-medium text-gray-700">Currency</label>
               <Select 
                 value={form.currency} 
                 onValueChange={(value: 'THB' | 'USDT' | 'MMK') => setForm(prev => ({ ...prev, currency: value }))}
@@ -168,8 +168,8 @@ export function AddExpenseDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Category *</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">Category *</label>
             <Select 
               value={form.category} 
               onValueChange={(value: keyof Budget['categories']) => setForm(prev => ({ ...prev, category: value }))}
@@ -190,8 +190,8 @@ export function AddExpenseDialog({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Description *</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">Description *</label>
             <Input
               placeholder="e.g., Lunch at restaurant"
               value={form.description}
@@ -200,18 +200,19 @@ export function AddExpenseDialog({
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Date</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">Date</label>
             <Input
               type="date"
               value={form.date}
               onChange={(e) => setForm(prev => ({ ...prev, date: e.target.value }))}
               required
+              className="text-base" 
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Account *</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">Account *</label>
             <Select 
               value={form.accountId} 
               onValueChange={(value) => setForm(prev => ({ ...prev, accountId: value }))}
@@ -229,15 +230,12 @@ export function AddExpenseDialog({
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: account.color }}
                         />
-                        <span>{account.accountNickname}</span>
+                        <span className="truncate">{account.accountNickname}</span>
                         {account.isDefault && (
                           <span className="text-xs bg-primary text-primary-foreground px-1 rounded">
                             Default
                           </span>
                         )}
-                        <span className="text-muted-foreground text-xs">
-                          ({account.bankName})
-                        </span>
                       </div>
                     </SelectItem>
                   ))}
@@ -245,41 +243,49 @@ export function AddExpenseDialog({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Payment Method</label>
-            <Select 
-              value={form.paymentMethod} 
-              onValueChange={(value: Expense['paymentMethod']) => setForm(prev => ({ ...prev, paymentMethod: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PAYMENT_METHODS.map((method) => (
-                  <SelectItem key={method} value={method}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">Payment Method</label>
+              <Select 
+                value={form.paymentMethod} 
+                onValueChange={(value: Expense['paymentMethod']) => setForm(prev => ({ ...prev, paymentMethod: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((method) => (
+                    <SelectItem key={method} value={method}>
                     {paymentMethodLabels[method]}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            </div>
+            
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">Location <span className="text-xs text-gray-400">(Optional)</span></label>
+              <Input
+                placeholder="e.g., Bangkok, Siam"
+                value={form.location}
+                onChange={(e) => setForm(prev => ({ ...prev, location: e.target.value }))}
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Location (Optional)</label>
-            <Input
-              placeholder="e.g., Bangkok, Siam"
-              value={form.location}
-              onChange={(e) => setForm(prev => ({ ...prev, location: e.target.value }))}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={loading || form.amount <= 0 || !form.description || !form.accountId}
+              className="w-full sm:w-auto"
             >
               {loading ? 'Adding...' : 'Add Expense'}
             </Button>

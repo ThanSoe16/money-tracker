@@ -26,85 +26,80 @@ export function BankAccountCard({
   return (
     <Card 
       className={cn(
-        "relative transition-all duration-200 hover:shadow-md hover:scale-105 animate-slide-in",
+        "relative transition-all duration-200 hover:shadow-md hover:scale-[1.02] animate-slide-in",
         className
       )}
-      style={{ borderTopColor: account.color, borderTopWidth: '3px' }}
+      style={{ borderLeftColor: account.color, borderLeftWidth: '4px' }}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3 p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1 mb-1">
-              <h3 className="font-semibold text-sm leading-none truncate">
+            <div className="flex items-center gap-2 mb-1">
+              <div
+                className="w-3 h-3 rounded-full flex-shrink-0"
+                style={{ backgroundColor: account.color }}
+              />
+              <h3 className="font-semibold text-base leading-none truncate">
                 {account.accountNickname}
               </h3>
               {account.isDefault && (
-                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
               )}
             </div>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-sm text-muted-foreground truncate">
               {account.bankName}
             </p>
-            {account.country !== 'TH' && (
-              <Badge variant="outline" className="text-xs mt-1 w-fit">
-                {account.country === 'MM' ? 'Myanmar' : 'Global'}
+            <div className="flex items-center gap-2 mt-2">
+              {account.country !== 'TH' && (
+                <Badge variant="outline" className="text-xs">
+                  {account.country === 'MM' ? 'Myanmar' : 'Global'}
+                </Badge>
+              )}
+              <Badge variant="secondary" className="text-xs capitalize">
+                {account.accountType}
               </Badge>
-            )}
+            </div>
           </div>
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             {onEdit && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-8 w-8 sm:h-6 sm:w-6"
                 onClick={() => onEdit(account)}
               >
-                <Edit className="h-3 w-3" />
+                <Edit className="h-4 w-4 sm:h-3 sm:w-3" />
               </Button>
             )}
             {onDelete && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 text-destructive hover:text-destructive"
+                className="h-8 w-8 sm:h-6 sm:w-6 text-destructive hover:text-destructive"
                 onClick={() => onDelete(account.id)}
               >
-                <Trash2 className="h-3 w-3" />
+                <Trash2 className="h-4 w-4 sm:h-3 sm:w-3" />
               </Button>
             )}
           </div>
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0">
-        <div className="flex items-end justify-between">
-          <div>
-            <div 
-              className={cn(
-                "text-lg font-bold",
-                isCredit && isNegative ? "text-red-600" : "text-foreground",
-                !isCredit && isNegative ? "text-red-600" : ""
-              )}
-            >
-              {formatCurrency(account.balance, account.currency)}
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span 
-                className="inline-block w-2 h-2 rounded-full" 
-                style={{ backgroundColor: account.color }}
-              />
-              <span className="text-xs text-muted-foreground capitalize">
-                {account.accountType}
-              </span>
-            </div>
+      <CardContent className="pt-0 p-4">
+        <div className="space-y-3">
+          <div 
+            className={cn(
+              "text-2xl sm:text-lg font-bold",
+              isCredit && isNegative ? "text-red-600" : "text-green-600",
+              !isCredit && isNegative ? "text-red-600" : ""
+            )}
+          >
+            {formatCurrency(account.balance, account.currency)}
           </div>
           
           <div className="text-right">
             <p className="text-xs text-muted-foreground">
-              Updated
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(account.lastUpdated).toLocaleDateString('th-TH', {
+              Updated {new Date(account.lastUpdated).toLocaleDateString('th-TH', {
                 month: 'short',
                 day: 'numeric'
               })}

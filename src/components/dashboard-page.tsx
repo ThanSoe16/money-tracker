@@ -110,59 +110,64 @@ export function DashboardPage() {
   })
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto p-4 space-y-6 max-w-7xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             Money Tracker 💰
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             {currentMonthName} - Your financial overview
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            onClick={() => setShowAddExpense(true)}
+            className="w-full sm:w-auto"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Expense
+          </Button>
           {!hasPermission && (
             <Button 
               variant="outline" 
               size="sm"
               onClick={requestNotificationPermission}
+              className="w-full sm:w-auto"
             >
               <Bell className="w-4 h-4 mr-2" />
-              Enable Alerts
+              <span className="sm:hidden">Enable Notifications</span>
+              <span className="hidden sm:inline">Enable Alerts</span>
             </Button>
           )}
-          <Button onClick={() => setShowAddExpense(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Expense
-          </Button>
         </div>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Balance</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-lg sm:text-2xl font-bold text-green-600">
               {formatTHBCompact(totalBalance)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Across {activeAccounts.filter(acc => acc.accountType !== 'credit').length} accounts
+              {activeAccounts.filter(acc => acc.accountType !== 'credit').length} accounts
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={`border-l-4 ${netWorth >= 0 ? 'border-l-blue-500' : 'border-l-red-500'}`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Net Worth</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">Net Worth</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-lg sm:text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {formatTHBCompact(netWorth)}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -171,36 +176,38 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={`border-l-4 ${isOverBudget ? 'border-l-red-500' : 'border-l-orange-500'}`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Spent</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">Monthly Spent</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${isOverBudget ? 'text-red-600' : ''}`}>
+            <div className={`text-lg sm:text-2xl font-bold ${isOverBudget ? 'text-red-600' : ''}`}>
               {formatTHBCompact(totalSpent)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {currentBudget ? `${Math.round(budgetProgress)}% of budget` : 'No budget set'}
+              {currentBudget ? `${Math.round(budgetProgress)}%` : 'No budget'}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={`border-l-4 ${
+          isOverBudget ? 'border-l-red-500' : budgetRemaining < (currentBudget?.totalBudget || 0) * 0.1 ? 'border-l-yellow-500' : 'border-l-green-500'
+        }`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               {isOverBudget ? 'Over Budget' : 'Budget Left'}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${
+            <div className={`text-lg sm:text-2xl font-bold ${
               isOverBudget ? 'text-red-600' : budgetRemaining < (currentBudget?.totalBudget || 0) * 0.1 ? 'text-orange-600' : 'text-green-600'
             }`}>
               {currentBudget ? formatTHBCompact(Math.abs(budgetRemaining)) : '---'}
             </div>
             <p className="text-xs text-muted-foreground">
-              {currentBudget ? (isOverBudget ? 'Amount over budget' : 'Remaining this month') : 'Set up budget'}
+              {currentBudget ? (isOverBudget ? 'Over budget' : 'Remaining') : 'Set budget'}
             </p>
           </CardContent>
         </Card>

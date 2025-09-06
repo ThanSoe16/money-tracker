@@ -137,7 +137,7 @@ export function BudgetSetupDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[90%] max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {existingBudget ? 'Edit Budget' : 'Set Monthly Budget'}

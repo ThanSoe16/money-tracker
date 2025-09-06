@@ -86,44 +86,64 @@ export function AccountsPage() {
   const creditAccounts = activeAccounts.filter(acc => acc.accountType === 'credit')
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto p-4 space-y-6 max-w-7xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold">Bank Accounts</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Bank Accounts</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Manage your bank accounts and track your balances
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowSettingsDialog(true)}>
-            <Settings className="w-4 h-4 mr-2" />
-            Exchange Settings
+        {/* Mobile-first button layout */}
+        <div className="grid grid-cols-2 sm:flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowAddDialog(true)}
+            className="sm:order-last"
+          >
+            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Add Account</span>
           </Button>
-          <Button variant="outline" onClick={() => setShowExchangeDialog(true)}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Exchange Currency
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowIncomeDialog(true)}
+          >
+            <ArrowUpCircle className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Add Income</span>
           </Button>
-          <Button variant="outline" onClick={() => setShowIncomeDialog(true)}>
-            <ArrowUpCircle className="w-4 h-4 mr-2" />
-            Add Income
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowExchangeDialog(true)}
+            className="col-span-2 sm:col-span-1"
+          >
+            <RefreshCw className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Exchange Currency</span>
           </Button>
-          <Button onClick={() => setShowAddDialog(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Account
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowSettingsDialog(true)}
+            className="col-span-2 sm:col-span-1"
+          >
+            <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Exchange Settings</span>
           </Button>
         </div>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {formatCurrency(totalBalance, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -132,13 +152,13 @@ export function AccountsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-red-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Debt</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-xl sm:text-2xl font-bold text-red-600">
               {formatCurrency(totalDebt, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -147,13 +167,13 @@ export function AccountsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={`border-l-4 ${netWorth >= 0 ? 'border-l-blue-500' : 'border-l-orange-500'} sm:col-span-2 lg:col-span-1`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Net Worth</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-xl sm:text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {formatCurrency(netWorth, 'THB')}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -183,8 +203,8 @@ export function AccountsPage() {
           {/* Savings Accounts */}
           {savingsAccounts.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Savings Accounts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Savings Accounts</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {savingsAccounts.map((account) => (
                   <BankAccountCard
                     key={account.id}
@@ -200,8 +220,8 @@ export function AccountsPage() {
           {/* Checking Accounts */}
           {checkingAccounts.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Checking Accounts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Checking Accounts</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {checkingAccounts.map((account) => (
                   <BankAccountCard
                     key={account.id}
@@ -217,8 +237,8 @@ export function AccountsPage() {
           {/* Credit Accounts */}
           {creditAccounts.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Credit Cards</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Credit Cards</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {creditAccounts.map((account) => (
                   <BankAccountCard
                     key={account.id}
